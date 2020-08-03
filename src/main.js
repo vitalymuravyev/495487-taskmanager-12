@@ -5,11 +5,11 @@ const siteMain = document.querySelector(`.main`);
 const siteHeader = siteMain.querySelector(`.main__control`);
 
 const render = (template, container, position) => {
-  container.insertAdjacentHTML(position, template)
+  container.insertAdjacentHTML(position, template);
 };
 
 const createSiteMenuTemplate = () => {
-  return(`<section class="control__btn-wrap">
+  return (`<section class="control__btn-wrap">
   <input
     type="radio"
     name="control"
@@ -41,8 +41,8 @@ const createSiteMenuTemplate = () => {
 };
 
 const createFilterTemplate = () => {
-  return(
-  `<section class="main__filter filter container">
+  return (
+    `<section class="main__filter filter container">
     <input
       type="radio"
       id="filter__all"
@@ -104,16 +104,16 @@ const createFilterTemplate = () => {
 };
 
 const createBoardTemplate = () => {
-  return(
+  return (
     `<section class="board container">
       <div class="board__filter-list"></div>
       <div class="board__tasks"></div>
     </section>`
-  )
-}
+  );
+};
 
 const createSortListTemplate = () => {
-  return(
+  return (
     `<a href="#" class="board__filter" data-sort-type="default">SORT BY DEFAULT</a>
     <a href="#" class="board__filter" data-sort-type="date-up">SORT BY DATE up</a>
     <a href="#" class="board__filter" data-sort-type="date-down">SORT BY DATE down</a>`
@@ -121,7 +121,7 @@ const createSortListTemplate = () => {
 };
 
 const createTaskTemplate = () => {
-  return(
+  return (
     `<article class="card card--black">
       <div class="card__form">
         <div class="card__inner">
@@ -165,12 +165,12 @@ const createTaskTemplate = () => {
         </div>
       </div>
     </article>`
-  )
-}
+  );
+};
 
 const createLoadButtonTemplate = () => {
-  return(` <button class="load-more" type="button">load more</button>`);
-}
+  return (` <button class="load-more" type="button">load more</button>`);
+};
 
 const createTaskEditTemplate = () => {
   return (
@@ -371,24 +371,24 @@ const createTaskEditTemplate = () => {
         </div>
       </form>
     </article>`
-  )
-}
+  );
+};
 
 render(createSiteMenuTemplate(), siteHeader, `beforeend`);
 render(createFilterTemplate(), siteMain, `beforeend`);
-render(createBoardTemplate(), siteMain, 'beforeend');
+render(createBoardTemplate(), siteMain, `beforeend`);
 
-const board = siteMain.querySelector('.board');
-const sortList = board.querySelector('.board__filter-list');
-const taskList = board.querySelector('.board__tasks');
+const board = siteMain.querySelector(`.board`);
+const sortList = board.querySelector(`.board__filter-list`);
+const taskList = board.querySelector(`.board__tasks`);
 
-render(createSortListTemplate(), sortList, 'afterbegin');
+render(createSortListTemplate(), sortList, `afterbegin`);
 
-render(createTaskEditTemplate(), taskList, 'beforeend');
+render(createTaskEditTemplate(), taskList, `beforeend`);
 
 for (let i = 0; i < TASK_COUNT; i++) {
-  render(createTaskTemplate(), taskList, 'beforeend');
+  render(createTaskTemplate(), taskList, `beforeend`);
 }
 
-render(createLoadButtonTemplate(), siteMain, 'beforeend');
+render(createLoadButtonTemplate(), taskList, `beforeend`);
 
