@@ -1,5 +1,22 @@
 import {COLORS} from "../const";
-import {isTaskRepeating, isTaskExpired} from "../utils";
+import {isTaskRepeating, isTaskExpired, createElement} from "../utils";
+
+const EMPTY_TASK = {
+  color: COLORS[0],
+  description: ``,
+  dueDate: null,
+  repeating: {
+    mo: false,
+    tu: false,
+    we: false,
+    th: false,
+    fr: false,
+    sa: false,
+    su: false
+  },
+  isArchive: false,
+  isFavorite: false
+};
 
 const createTaskEditDateTemplate = (dueDate) => {
   return (
@@ -63,30 +80,21 @@ const createTaskEditColorsTemplate = (currentColor) => {
   >`).join(``);
 };
 
-export const createTaskEditTemplate = (task = {}) => {
-  const {
-    color = `black`,
-    description = ``,
-    dueDate = null,
-    repeatingDays = {
-      mo: false,
-      tu: false,
-      we: false,
-      th: false,
-      fr: false,
-      sa: false,
-      su: false,
-    },
-  } = task;
+export default class TaskEdit {
+  constructor(task = EMPTY_TASK) {
+    this._element = null;
+    this._task = task;
+  }
 
-  const dateTemplate = createTaskEditDateTemplate(dueDate);
-  const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
-  const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
-  const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays);
-  const colorTemplate = createTaskEditColorsTemplate(color);
+  _getTemplate({color, dueDate, repeatingDays, description}) {
+    const dateTemplate = createTaskEditDateTemplate(dueDate);
+    const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
+    const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
+    const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays);
+    const colorTemplate = createTaskEditColorsTemplate(color);
 
-  return (
-    `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
+    return (
+      `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__color-bar">
@@ -128,5 +136,18 @@ export const createTaskEditTemplate = (task = {}) => {
         </div>
       </form>
     </article>`
-  );
-};
+    );
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this._getTemplate(this._task));
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,5 +1,5 @@
 import {COLORS} from "../const";
-import {getRandomInteger, generateRandomValue} from "../utils";
+import {getRandomInteger, generateRandomValue, getRandomBoolen} from "../utils";
 
 const DESCRIPTIONS = [`Изучить теорию`, `Сделать домашку`, `Пройти интенсив на соточку`];
 const MAX_DATE_GAP = 7;
@@ -22,17 +22,16 @@ const generateRandomDate = () => {
   return currentDate;
 };
 
-const generateRepeating = () => {
-  return {
-    mo: Boolean(getRandomInteger(0, 1)),
-    tu: false,
-    we: Boolean(getRandomInteger(0, 1)),
-    th: false,
-    fr: Boolean(getRandomInteger(0, 1)),
-    sa: false,
-    su: false,
-  };
-};
+const generateRepeating = () => ({
+  mo: getRandomBoolen(),
+  tu: false,
+  we: getRandomBoolen(),
+  th: false,
+  fr: getRandomBoolen(),
+  sa: false,
+  su: false,
+});
+
 
 const generateTask = () => {
   const description = generateRandomValue(DESCRIPTIONS);
@@ -53,8 +52,8 @@ const generateTask = () => {
     dueDate,
     repeatingDays,
     color,
-    isFavorite: Boolean(getRandomInteger(0, 1)),
-    isArchive: Boolean(getRandomInteger(0, 1)),
+    isFavorite: getRandomBoolen(),
+    isArchive: getRandomBoolen(),
   };
 };
 
