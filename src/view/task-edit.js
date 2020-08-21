@@ -1,5 +1,6 @@
 import {COLORS} from "../const";
-import {isTaskRepeating, isTaskExpired, createElement} from "../utils";
+import {isTaskRepeating, isTaskExpired} from "../utils";
+import AbstractView from "./abstract";
 
 const EMPTY_TASK = {
   color: COLORS[0],
@@ -80,74 +81,65 @@ const createTaskEditColorsTemplate = (currentColor) => {
   >`).join(``);
 };
 
-export default class TaskEdit {
+export default class TaskEdit extends AbstractView {
   constructor(task = EMPTY_TASK) {
-    this._element = null;
+    super();
     this._task = task;
   }
 
-  _getTemplate({color, dueDate, repeatingDays, description}) {
-    const dateTemplate = createTaskEditDateTemplate(dueDate);
-    const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
-    const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
-    const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays);
-    const colorTemplate = createTaskEditColorsTemplate(color);
+  _getTemplate() {
+    return (({color, dueDate, repeatingDays, description}) => {
+      const dateTemplate = createTaskEditDateTemplate(dueDate);
+      const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
+      const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
+      const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays);
+      const colorTemplate = createTaskEditColorsTemplate(color);
 
-    return (
-      `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
-      <form class="card__form" method="get">
-        <div class="card__inner">
-          <div class="card__color-bar">
-            <svg class="card__color-bar-wave" width="100%" height="10">
-              <use xlink:href="#wave"></use>
-            </svg>
-          </div>
+      return (
+        `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
+        <form class="card__form" method="get">
+          <div class="card__inner">
+            <div class="card__color-bar">
+              <svg class="card__color-bar-wave" width="100%" height="10">
+                <use xlink:href="#wave"></use>
+              </svg>
+            </div>
 
-          <div class="card__textarea-wrap">
-            <label>
-              <textarea
-                class="card__text"
-                placeholder="Start typing your text here..."
-                name="text"
-              >${description}</textarea>
-            </label>
-          </div>
+            <div class="card__textarea-wrap">
+              <label>
+                <textarea
+                  class="card__text"
+                  placeholder="Start typing your text here..."
+                  name="text"
+                >${description}</textarea>
+              </label>
+            </div>
 
-          <div class="card__settings">
-            <div class="card__details">
-              <div class="card__dates">
-                ${dateTemplate}
-                ${repeatingTemplate}
+            <div class="card__settings">
+              <div class="card__details">
+                <div class="card__dates">
+                  ${dateTemplate}
+                  ${repeatingTemplate}
+                </div>
+              </div>
+
+              <div class="card__colors-inner">
+                <h3 class="card__colors-title">Color</h3>
+                <div class="card__colors-wrap">
+                ${colorTemplate}
+                </div>
               </div>
             </div>
 
-            <div class="card__colors-inner">
-              <h3 class="card__colors-title">Color</h3>
-              <div class="card__colors-wrap">
-              ${colorTemplate}
-              </div>
+            <div class="card__status-btns">
+              <button class="card__save" type="submit">save</button>
+              <button class="card__delete" type="button">delete</button>
             </div>
           </div>
+        </form>
+      </article>`
+      );
+    })(this._task);
 
-          <div class="card__status-btns">
-            <button class="card__save" type="submit">save</button>
-            <button class="card__delete" type="button">delete</button>
-          </div>
-        </div>
-      </form>
-    </article>`
-    );
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this._getTemplate(this._task));
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
