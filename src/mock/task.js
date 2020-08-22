@@ -1,5 +1,5 @@
 import {COLORS} from "../const";
-import {getRandomInteger, generateRandomValue, getRandomBoolen} from "../utils";
+import {getRandomInteger, generateRandomValue, getRandomBoolen} from "../utils/common";
 
 const DESCRIPTIONS = [`Изучить теорию`, `Сделать домашку`, `Пройти интенсив на соточку`];
 const MAX_DATE_GAP = 7;

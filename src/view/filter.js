@@ -19,24 +19,15 @@ export default class Filter extends AbstractView {
     this._filters = filters;
   }
 
-  // _getTemplate() {
-  //   return this._createTemplate(this._filters);
-  // }
-
-  // _createTemplate(filterItems) {
-  //   const filterItemsTemplate = filterItems.map((filter, index) => createFilterItemTemplate(filter, index === 0)).join(``);
-  //   return (
-  //     `<section class="main__filter filter container">
-  //     ${filterItemsTemplate}
-  //   </section>`);
-  // }
   _getTemplate() {
-    return ((filterItems) => {
-      const filterItemsTemplate = filterItems.map((filter, index) => createFilterItemTemplate(filter, index === 0)).join(``);
-      return (
-        `<section class="main__filter filter container">
-        ${filterItemsTemplate}
-      </section>`);
-    })(this._filters);
+    return this._createTemplate(this._filters);
+  }
+
+  _createTemplate(filterItems) {
+    const filterItemsTemplate = filterItems.map((filter, index) => createFilterItemTemplate(filter, index === 0)).join(``);
+    return (
+      `<section class="main__filter filter container">
+      ${filterItemsTemplate}
+    </section>`);
   }
 }

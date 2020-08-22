@@ -1,5 +1,5 @@
 import {COLORS} from "../const";
-import {isTaskRepeating, isTaskExpired} from "../utils";
+import {isTaskRepeating, isTaskExpired} from "../utils/task";
 import AbstractView from "./abstract";
 
 const EMPTY_TASK = {
@@ -85,61 +85,74 @@ export default class TaskEdit extends AbstractView {
   constructor(task = EMPTY_TASK) {
     super();
     this._task = task;
+    this._onFormSubmit = this._onFormSubmit.bind(this);
   }
 
   _getTemplate() {
-    return (({color, dueDate, repeatingDays, description}) => {
-      const dateTemplate = createTaskEditDateTemplate(dueDate);
-      const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
-      const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
-      const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays);
-      const colorTemplate = createTaskEditColorsTemplate(color);
+    return this._createTemplate(this._task);
 
-      return (
-        `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
-        <form class="card__form" method="get">
-          <div class="card__inner">
-            <div class="card__color-bar">
-              <svg class="card__color-bar-wave" width="100%" height="10">
-                <use xlink:href="#wave"></use>
-              </svg>
-            </div>
+  }
 
-            <div class="card__textarea-wrap">
-              <label>
-                <textarea
-                  class="card__text"
-                  placeholder="Start typing your text here..."
-                  name="text"
-                >${description}</textarea>
-              </label>
-            </div>
+  _createTemplate({color, dueDate, repeatingDays, description}) {
+    const dateTemplate = createTaskEditDateTemplate(dueDate);
+    const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
+    const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
+    const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays);
+    const colorTemplate = createTaskEditColorsTemplate(color);
 
-            <div class="card__settings">
-              <div class="card__details">
-                <div class="card__dates">
-                  ${dateTemplate}
-                  ${repeatingTemplate}
-                </div>
-              </div>
+    return (
+      `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
+      <form class="card__form" method="get">
+        <div class="card__inner">
+          <div class="card__color-bar">
+            <svg class="card__color-bar-wave" width="100%" height="10">
+              <use xlink:href="#wave"></use>
+            </svg>
+          </div>
 
-              <div class="card__colors-inner">
-                <h3 class="card__colors-title">Color</h3>
-                <div class="card__colors-wrap">
-                ${colorTemplate}
-                </div>
+          <div class="card__textarea-wrap">
+            <label>
+              <textarea
+                class="card__text"
+                placeholder="Start typing your text here..."
+                name="text"
+              >${description}</textarea>
+            </label>
+          </div>
+
+          <div class="card__settings">
+            <div class="card__details">
+              <div class="card__dates">
+                ${dateTemplate}
+                ${repeatingTemplate}
               </div>
             </div>
 
-            <div class="card__status-btns">
-              <button class="card__save" type="submit">save</button>
-              <button class="card__delete" type="button">delete</button>
+            <div class="card__colors-inner">
+              <h3 class="card__colors-title">Color</h3>
+              <div class="card__colors-wrap">
+              ${colorTemplate}
+              </div>
             </div>
           </div>
-        </form>
-      </article>`
-      );
-    })(this._task);
 
+          <div class="card__status-btns">
+            <button class="card__save" type="submit">save</button>
+            <button class="card__delete" type="button">delete</button>
+          </div>
+        </div>
+      </form>
+    </article>`
+    );
+  }
+
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setOnFormSubmit(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._onFormSubmit);
   }
 }
