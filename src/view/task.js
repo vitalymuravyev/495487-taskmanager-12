@@ -1,12 +1,19 @@
-import {isTaskRepeating, isTaskExpired, createElement} from "../utils";
+import {isTaskRepeating, isTaskExpired} from "../utils/task";
+import AbstractView from "./abstract";
 
-export default class Task {
+export default class Task extends AbstractView {
   constructor(task) {
-    this._element = null;
+    super();
     this._task = task;
+    this._onEditClick = this._onEditClick.bind(this);
   }
 
-  _getTemplate(task) {
+  _getTemplate() {
+    return this._createTemplate(this._task);
+
+  }
+
+  _createTemplate(task) {
     const {color, description, dueDate, isArchive, isFavorite, repeatingDays} = task;
 
     const date = dueDate !== null ? dueDate.toLocaleString(`en-US`, {day: `numeric`, month: `long`}) : ``;
@@ -62,15 +69,13 @@ export default class Task {
     );
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this._getTemplate(this._task));
-    }
-
-    return this._element;
+  _onEditClick(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setOnEditClick(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, this._onEditClick);
   }
 }

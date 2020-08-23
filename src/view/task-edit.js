@@ -1,5 +1,6 @@
 import {COLORS} from "../const";
-import {isTaskRepeating, isTaskExpired, createElement} from "../utils";
+import {isTaskRepeating, isTaskExpired} from "../utils/task";
+import AbstractView from "./abstract";
 
 const EMPTY_TASK = {
   color: COLORS[0],
@@ -80,13 +81,19 @@ const createTaskEditColorsTemplate = (currentColor) => {
   >`).join(``);
 };
 
-export default class TaskEdit {
+export default class TaskEdit extends AbstractView {
   constructor(task = EMPTY_TASK) {
-    this._element = null;
+    super();
     this._task = task;
+    this._onFormSubmit = this._onFormSubmit.bind(this);
   }
 
-  _getTemplate({color, dueDate, repeatingDays, description}) {
+  _getTemplate() {
+    return this._createTemplate(this._task);
+
+  }
+
+  _createTemplate({color, dueDate, repeatingDays, description}) {
     const dateTemplate = createTaskEditDateTemplate(dueDate);
     const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
     const repeatingClassName = isTaskRepeating(repeatingDays) ? `card--repeat` : ``;
@@ -139,15 +146,13 @@ export default class TaskEdit {
     );
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this._getTemplate(this._task));
-    }
-
-    return this._element;
+  _onFormSubmit(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setOnFormSubmit(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._onFormSubmit);
   }
 }
