@@ -1,12 +1,13 @@
 import BoardView from "../view/board";
 import SortView from "../view/sort-list";
 import TaskListView from "../view/task-list";
-import TaskView from "../view/task";
 import LoadMoreButtonView from "../view/load-button";
-import TaskEditView from "../view/task-edit";
 import NoTaskView from "../view/no-task";
 
-import {render, RenderPosition, remove, replace} from "../utils/render";
+import TaskPresenter from "./task";
+
+import {render, RenderPosition, remove} from "../utils/render";
+import {updateItem} from "../utils/common";
 
 const TASK_COUNT_PER_STEP = 8;
 
@@ -14,6 +15,7 @@ export default class Board {
   constructor(boardContainer) {
     this._boardContainer = boardContainer;
     this._renderedTaskCount = TASK_COUNT_PER_STEP;
+    this._taskPresenter = {};
 
     this._boardComponent = new BoardView();
     this._sortComponent = new SortView();
@@ -22,6 +24,8 @@ export default class Board {
     this._loadMoreButtonComponent = new LoadMoreButtonView();
 
     this._onLoadMoreButtonClick = this._onLoadMoreButtonClick.bind(this);
+    this._onTaskChange = this._onTaskChange.bind(this);
+    this._onModeChange = this._onModeChange.bind(this);
   }
 
   init(boardTasks) {
@@ -53,36 +57,10 @@ export default class Board {
   }
 
   _renderTask(task) {
-    const taskComponent = new TaskView(task);
-    const taskEditComponent = new TaskEditView(task);
+    const taskPresenter = new TaskPresenter(this._taskListComponent, this._onTaskChange, this._onModeChange);
+    taskPresenter.init(task);
+    this._taskPresenter[task.id] = taskPresenter;
 
-    const replaceCardToForm = () => {
-      replace(taskEditComponent, taskComponent);
-      document.addEventListener(`keydown`, onEscapePress);
-    };
-    const replaceFormToCard = () => {
-      replace(taskComponent, taskEditComponent);
-    };
-
-    const onEscapePress = (evt) => {
-      if (evt.key === `Escape`) {
-        evt.preventDefault();
-        replaceFormToCard();
-        document.removeEventListener(`keydown`, onEscapePress);
-      }
-    };
-
-    taskComponent.setOnEditClick(() => {
-      replaceCardToForm();
-    });
-
-    taskEditComponent.setOnFormSubmit(() => {
-      replaceFormToCard();
-      document.removeEventListener(`keydown`, onEscapePress);
-    });
-
-
-    render(taskComponent, this._taskListComponent, RenderPosition.BEFORE_END);
   }
 
   _renderTasks(from, to) {
@@ -112,5 +90,25 @@ export default class Board {
 
   _renderNoTasks() {
     render(this._noTaskComponent, this._boardComponent, RenderPosition.AFTER_BEGIN);
+  }
+  // понадобится при выполнении задания 5.2
+  _clearTaskList() {
+    Object
+      .values(this._taskPresenter)
+      .forEach((presenter) => presenter.destroy());
+
+    this._taskPresenter = {};
+  }
+
+  _onTaskChange(updatedTask) {
+    this._boardTasks = updateItem(this._boardTasks, updatedTask);
+    // this._sourcedBoardTasks = updateItem(this._sourcedBoardTasks, updatedTask);
+    this._taskPresenter[updatedTask.id].init(updatedTask);
+  }
+
+  _onModeChange() {
+    Object
+      .values(this._taskPresenter)
+      .forEach((presenter) => presenter.resetView());
   }
 }
