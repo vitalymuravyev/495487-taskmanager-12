@@ -1,6 +1,9 @@
 import {COLORS} from "../const";
-import {isTaskRepeating, isTaskExpired} from "../utils/task";
+import {isTaskRepeating, formatTaskDueDate} from "../utils/task";
 import SmartView from "./smart";
+import flatpickr from "flatpickr";
+
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const EMPTY_TASK = {
   color: COLORS[0],
@@ -32,7 +35,7 @@ const createTaskEditDateTemplate = (dueDate, isDueDate) => {
           type="text"
           placeholder=""
           name="date"
-          value="${dueDate !== null ? dueDate.toLocaleString(`en-US`, {day: `numeric`, month: `long`}) : ``}"
+          value="${formatTaskDueDate(dueDate)}"
         />
       </label>
     </fieldset>` : ``}`
@@ -85,6 +88,7 @@ export default class TaskEdit extends SmartView {
   constructor(task = EMPTY_TASK) {
     super();
     this._data = TaskEdit.parseTaskToData(task);
+    this._datepicker = null;
 
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onDueDateToggle = this._onDueDateToggle.bind(this);
@@ -92,8 +96,10 @@ export default class TaskEdit extends SmartView {
     this._onDescriptionInput = this._onDescriptionInput.bind(this);
     this._onRepeatingChange = this._onRepeatingChange.bind(this);
     this._onColorChange = this._onColorChange.bind(this);
+    this._onDueDateChange = this._onDueDateChange.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
   _getTemplate() {
@@ -103,14 +109,13 @@ export default class TaskEdit extends SmartView {
 
   _createTemplate({color, dueDate, repeatingDays, description, isDueDate, isRepeating}) {
     const dateTemplate = createTaskEditDateTemplate(dueDate, isDueDate);
-    const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
     const repeatingClassName = isRepeating ? `card--repeat` : ``;
     const repeatingTemplate = createTaskEditRepeatingTemplate(repeatingDays, isRepeating);
     const colorTemplate = createTaskEditColorsTemplate(color);
-    const isSubmitDisabled = isRepeating && !isTaskRepeating(repeatingDays);
+    const isSubmitDisabled = (isDueDate && dueDate === null) || (isRepeating && !isTaskRepeating(repeatingDays));
 
     return (
-      `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
+      `<article class="card card--edit card--${color} ${repeatingClassName}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__color-bar">
@@ -189,6 +194,24 @@ export default class TaskEdit extends SmartView {
     }
   }
 
+  _setDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+
+    if (this._data.isDueDate) {
+      this._datepicker = flatpickr(
+          this.getElement().querySelector(`.card__date`),
+          {
+            dateFormat: `j F`,
+            defaultDate: this._data.dueDate,
+            onChange: this._onDueDateChange,
+          }
+      );
+    }
+  }
+
   _onDescriptionInput(evt) {
     evt.preventDefault();
     this.updateData({description: evt.target.value}, true);
@@ -210,6 +233,12 @@ export default class TaskEdit extends SmartView {
     this.updateData({
       color: evt.target.value
     });
+  }
+
+  _onDueDateChange(userDate) {
+    userDate[0].setHours(23, 59, 59, 9999);
+
+    this.updateData({dueDate: userDate[0]});
   }
 
   setOnFormSubmit(callback) {
@@ -255,6 +284,7 @@ export default class TaskEdit extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepicker();
     this.setOnFormSubmit(this._callback.formSubmit);
   }
 

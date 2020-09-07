@@ -1,4 +1,4 @@
-import {isTaskRepeating, isTaskExpired} from "../utils/task";
+import {isTaskRepeating, isTaskExpired, formatTaskDueDate} from "../utils/task";
 import AbstractView from "./abstract";
 
 export default class Task extends AbstractView {
@@ -19,7 +19,7 @@ export default class Task extends AbstractView {
   _createTemplate(task) {
     const {color, description, dueDate, isArchive, isFavorite, repeatingDays} = task;
 
-    const date = dueDate !== null ? dueDate.toLocaleString(`en-US`, {day: `numeric`, month: `long`}) : ``;
+    const date = formatTaskDueDate(dueDate);
     const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
     const archiveClassName = isArchive ? `card__btn--archive card__btn--disabled` : `card__btn--archive`;
     const favoriteClassName = isFavorite ? `card__btn--favorites card__btn--disabled` : `card__btn--favorites`;
