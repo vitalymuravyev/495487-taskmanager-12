@@ -5,7 +5,7 @@ const DESCRIPTIONS = [`Изучить теорию`, `Сделать домаш�
 const MAX_DATE_GAP = 7;
 export const TASK_COUNT = 22;
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateRandomDate = () => {
   const isDate = Boolean(getRandomInteger(0, 1));

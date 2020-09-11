@@ -2,6 +2,7 @@ import {COLORS} from "../const";
 import {isTaskRepeating, formatTaskDueDate} from "../utils/task";
 import SmartView from "./smart";
 import flatpickr from "flatpickr";
+import he from "he";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
@@ -9,7 +10,7 @@ const EMPTY_TASK = {
   color: COLORS[0],
   description: ``,
   dueDate: null,
-  repeating: {
+  repeatingDays: {
     mo: false,
     tu: false,
     we: false,
@@ -131,7 +132,7 @@ export default class TaskEdit extends SmartView {
                 class="card__text"
                 placeholder="Start typing your text here..."
                 name="text"
-              >${description}</textarea>
+              >${he.encode(description)}</textarea>
             </label>
           </div>
 
@@ -245,10 +246,10 @@ export default class TaskEdit extends SmartView {
     });
   }
 
-  _onDueDateChange(userDate) {
-    userDate[0].setHours(23, 59, 59, 9999);
+  _onDueDateChange([userDate]) {
+    userDate.setHours(23, 59, 59, 999);
 
-    this.updateData({dueDate: userDate[0]});
+    this.updateData({dueDate: userDate});
   }
 
   _onFormDeleteClick(evt) {
@@ -306,6 +307,7 @@ export default class TaskEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepicker();
     this.setOnFormSubmit(this._callback.formSubmit);
+    this.setOnDeleteClick(this._callback.deleteClick);
   }
 
   reset(task) {

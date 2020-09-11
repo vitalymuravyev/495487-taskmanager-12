@@ -1,6 +1,8 @@
 import {isTaskRepeating, isTaskExpired, formatTaskDueDate} from "../utils/task";
 import AbstractView from "./abstract";
 
+import he from "he";
+
 export default class Task extends AbstractView {
   constructor(task) {
     super();
@@ -51,7 +53,7 @@ export default class Task extends AbstractView {
             </div>
 
             <div class="card__textarea-wrap">
-              <p class="card__text">${description}</p>
+              <p class="card__text">${he.encode(description)}</p>
             </div>
 
             <div class="card__settings">

@@ -34,8 +34,8 @@ export default class Task {
     const prevTaskComponent = this._taskComponent;
     const prevTaskEditComponent = this._taskEditComponent;
 
-    this._taskComponent = new TaskView(this._task);
-    this._taskEditComponent = new TaskEditView(this._task);
+    this._taskComponent = new TaskView(task);
+    this._taskEditComponent = new TaskEditView(task);
 
     this._taskComponent.setOnEditClick(this._onEditClick);
     this._taskComponent.setOnFavotiteClick(this._onFavoriteClick);
@@ -99,7 +99,7 @@ export default class Task {
   }
 
   _onFormSubmit(update) {
-    const isMinorUpdate = isDatesEqual(this._task.dueDate, update.dueDate)
+    const isMinorUpdate = !isDatesEqual(this._task.dueDate, update.dueDate)
     || isTaskRepeating(this._task.repeatingDays) !== isTaskRepeating(update.repeatingDays);
 
     this._changeData(

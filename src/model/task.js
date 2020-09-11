@@ -43,7 +43,7 @@ export default class Tasks extends Observer {
     const index = this._tasks.findIndex((task) => task.id === update.id);
 
     if (index === -1) {
-      throw new Error(`Can't remove unexisting task`);
+      throw new Error(`Can't delete unexisting task`);
     }
 
     this._tasks = [
