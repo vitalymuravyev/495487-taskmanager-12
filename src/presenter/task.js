@@ -2,6 +2,8 @@ import TaskView from "../view/task";
 import TaskEditView from "../view/task-edit";
 
 import {render, RenderPosition, replace, remove} from "../utils/render";
+import {isDatesEqual, isTaskRepeating} from "../utils/task";
+import {UserAction, UpdateType} from "../const";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -23,6 +25,7 @@ export default class Task {
     this._onFormSubmit = this._onFormSubmit.bind(this);
     this._onFavoriteClick = this._onFavoriteClick.bind(this);
     this._onArchiveClick = this._onArchiveClick.bind(this);
+    this._onDeleteClick = this._onDeleteClick.bind(this);
   }
 
   init(task) {
@@ -31,14 +34,15 @@ export default class Task {
     const prevTaskComponent = this._taskComponent;
     const prevTaskEditComponent = this._taskEditComponent;
 
-    this._taskComponent = new TaskView(this._task);
-    this._taskEditComponent = new TaskEditView(this._task);
+    this._taskComponent = new TaskView(task);
+    this._taskEditComponent = new TaskEditView(task);
 
     this._taskComponent.setOnEditClick(this._onEditClick);
     this._taskComponent.setOnFavotiteClick(this._onFavoriteClick);
     this._taskComponent.setOnArchiveClick(this._onArchiveClick);
 
     this._taskEditComponent.setOnFormSubmit(this._onFormSubmit);
+    this._taskEditComponent.setOnDeleteClick(this._onDeleteClick);
 
     if (prevTaskComponent === null || prevTaskEditComponent === null) {
       render(this._taskComponent, this._taskListContainer, RenderPosition.BEFORE_END);
@@ -94,20 +98,39 @@ export default class Task {
     this._replaceCardToForm();
   }
 
-  _onFormSubmit(task) {
-    this._changeData(task);
+  _onFormSubmit(update) {
+    const isMinorUpdate = !isDatesEqual(this._task.dueDate, update.dueDate)
+    || isTaskRepeating(this._task.repeatingDays) !== isTaskRepeating(update.repeatingDays);
+
+    this._changeData(
+        UserAction.UPDATE_TASK,
+        isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+        update
+    );
     this._replaceFormToCard();
   }
 
   _onFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_TASK,
+        UpdateType.MINOR,
         Object.assign({}, this._task, {isFavorite: !this._task.isFavorite})
     );
   }
 
   _onArchiveClick() {
     this._changeData(
+        UserAction.UPDATE_TASK,
+        UpdateType.MINOR,
         Object.assign({}, this._task, {isArchive: !this._task.isArchive})
+    );
+  }
+
+  _onDeleteClick(task) {
+    this._changeData(
+        UserAction.DELETE_TASK,
+        UpdateType.MINOR,
+        task
     );
   }
 }

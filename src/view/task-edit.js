@@ -2,6 +2,7 @@ import {COLORS} from "../const";
 import {isTaskRepeating, formatTaskDueDate} from "../utils/task";
 import SmartView from "./smart";
 import flatpickr from "flatpickr";
+import he from "he";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
@@ -9,7 +10,7 @@ const EMPTY_TASK = {
   color: COLORS[0],
   description: ``,
   dueDate: null,
-  repeating: {
+  repeatingDays: {
     mo: false,
     tu: false,
     we: false,
@@ -97,6 +98,7 @@ export default class TaskEdit extends SmartView {
     this._onRepeatingChange = this._onRepeatingChange.bind(this);
     this._onColorChange = this._onColorChange.bind(this);
     this._onDueDateChange = this._onDueDateChange.bind(this);
+    this._onFormDeleteClick = this._onFormDeleteClick.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -130,7 +132,7 @@ export default class TaskEdit extends SmartView {
                 class="card__text"
                 placeholder="Start typing your text here..."
                 name="text"
-              >${description}</textarea>
+              >${he.encode(description)}</textarea>
             </label>
           </div>
 
@@ -158,6 +160,15 @@ export default class TaskEdit extends SmartView {
       </form>
     </article>`
     );
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
   }
 
   _onFormSubmit(evt) {
@@ -235,15 +246,25 @@ export default class TaskEdit extends SmartView {
     });
   }
 
-  _onDueDateChange(userDate) {
-    userDate[0].setHours(23, 59, 59, 9999);
+  _onDueDateChange([userDate]) {
+    userDate.setHours(23, 59, 59, 999);
 
-    this.updateData({dueDate: userDate[0]});
+    this.updateData({dueDate: userDate});
+  }
+
+  _onFormDeleteClick(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(TaskEdit.parseDataToTask(this._data));
   }
 
   setOnFormSubmit(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._onFormSubmit);
+  }
+
+  setOnDeleteClick(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.card__delete`).addEventListener(`click`, this._onFormDeleteClick);
   }
 
   static parseTaskToData(task) {
@@ -286,6 +307,7 @@ export default class TaskEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepicker();
     this.setOnFormSubmit(this._callback.formSubmit);
+    this.setOnDeleteClick(this._callback.deleteClick);
   }
 
   reset(task) {

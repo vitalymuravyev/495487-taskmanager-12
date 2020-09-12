@@ -16,7 +16,7 @@ export const isTaskExpired = (dueDate) => {
 
   const currentDate = getCurrentDate();
 
-  return dueDate < currentDate;
+  return moment(currentDate).isAfter(dueDate, `day`);
 };
 
 export const isTaskExpiringToday = (dueDate) => {
@@ -26,7 +26,7 @@ export const isTaskExpiringToday = (dueDate) => {
 
   const currentDate = getCurrentDate();
 
-  return currentDate === dueDate;
+  return moment(dueDate).isSame(currentDate, `day`);
 };
 
 const getWeightForNullDate = (dateA, dateB) => {
@@ -71,4 +71,12 @@ export const formatTaskDueDate = (dueDate) => {
   }
 
   return moment(dueDate).format(`D MMMM`);
+};
+
+export const isDatesEqual = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return true;
+  }
+
+  return moment(dateA).isSame(dateB, `day`);
 };
