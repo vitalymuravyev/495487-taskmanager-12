@@ -1,7 +1,7 @@
 import TaskEditView from "../view/task-edit";
 
 import {RenderPosition, render, remove} from "../utils/render";
-import {generateId} from "../mock/task";
+import {generateId} from "../utils/task";
 import {UserAction, UpdateType} from "../const";
 
 export default class TaskNew {

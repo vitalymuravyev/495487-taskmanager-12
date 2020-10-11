@@ -6,8 +6,10 @@ export default class Tasks extends Observer {
     this._tasks = [];
   }
 
-  setTasks(tasks) {
+  setTasks(updateType, tasks) {
     this._tasks = tasks.slice();
+
+    this._notify(updateType);
   }
 
   getTasks() {
@@ -52,5 +54,34 @@ export default class Tasks extends Observer {
     ];
 
     this._notify(updateType);
+  }
+
+  static adaptToClient(task) {
+    const adaptedTask = Object.assign({}, task, {isArchive: task.is_archived, isFavorite: task.is_favorite,
+      repeatingDays: task.repeating_days,
+      dueDate: task.due_date !== null ? new Date(task.due_date) : task.due_date});
+
+    delete adaptedTask.due_date;
+    delete adaptedTask.is_archived;
+    delete adaptedTask.is_favorite;
+    delete adaptedTask.repeating_days;
+
+    return adaptedTask;
+  }
+
+  static adaptToServer(task) {
+    const adaptedTask = Object.assign({}, task, {
+      "is_archived": task.isArchive,
+      "is_favorite": task.isFavorite,
+      "repeating_days": task.repeatingDays,
+      "due_date": task.dueDate instanceof Date ? task.dueDate.toISOString() : null
+    });
+
+    delete adaptedTask.isArchive;
+    delete adaptedTask.isFavorite;
+    delete adaptedTask.repeatingDays;
+    delete adaptedTask.dueDate;
+
+    return adaptedTask;
   }
 }
